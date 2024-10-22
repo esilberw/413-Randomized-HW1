@@ -32,8 +32,13 @@ class RandomizedSelectionAlgo:
             self.lazy_select_bound_flag = True
 
     def partition(self, low, high, random_pivot):
+        """
+        :param low: lower bound of the partition
+        :param high: higher bound of the partition
+        :param random_pivot: random pivot of the partition chosen randomly in the recursive_quick_select() function
+        :return: the index of the actual random pivot after partitioning
+        """""
         i = 0
-
         for j in range(low, high):
             if self.array[j] < random_pivot:    # sort all the element < pivot before the pivot
                 self.comparison_counter += 1
@@ -45,71 +50,112 @@ class RandomizedSelectionAlgo:
         return i
 
     def recursive_quick_select(self, low, high, k):
+        """
+        :param low: lower bound of the partition
+        :param high: upper bound of the partition
+        :param k: the kth largest element of the array
+        :return: the kth largest element
+        """
 
         random_pivot = random.choice(self.array)
         pivot_index = self.partition(low, high, random_pivot)
 
-        if self.array[pivot_index] == k:  # if the element is found
+        if pivot_index - 1 == k - 1:  # if the element is found
             self.found_elem = self.array[pivot_index]
             self.index_elem = pivot_index
             self.quick_select_bound_checking()
-            return pivot_index, self.array[pivot_index]
-        elif pivot_index > k:  # k is at the left of the pivot
+            return pivot_index - 1, self.array[pivot_index -1]
+
+        elif pivot_index - 1> k - 1:  # k is at the left of the pivot
             return self.recursive_quick_select(low, pivot_index - 1, k)
+
         else:   # k is at the right of the pivot
             return self.recursive_quick_select(pivot_index + 1, high, k)
 
-
     def rank_determination(self, x):
-        rank_x = 0
+        rank_x = 1
         for elem in self.array:
-            print("TAMERE")
+            if elem < x:
+                rank_x += 1
         return rank_x
 
     def lazy_select(self, k):
-        n_exp_3_4 = int(self.n ** (3/4)) # need to convert in int for the forloop
-        random_pick_elems_R = []
+        """
+        :param k: k-th smallest element in the array >< the element k in the array !
+        :param k:
+        :return:
+        """
         P = []
-        a, b = 0, 0
+        n_exp_3_4 = int(round(self.n ** (3/4)))  # need to convert in int for the forloop
+        found_flag = False
 
-        while k not in P and len(P) >= 4*self.n**3/4 + 2:
+        while not found_flag:
+            index = 0
+            random_pick_elems_R = []
+            P = []
+
             for i in range(n_exp_3_4):
                 new_random_pick = random.choice(self.array)
-                while new_random_pick not in random_pick_elems_R:
-                    random_pick_elems_R.append(new_random_pick) # to ensure that we don't add an element already picked
+                while new_random_pick in random_pick_elems_R:
+                    new_random_pick = random.choice(self.array)  # to ensure that we don't add an element already picked
 
-            random_pick_elems_R.sort() # sort() use the timsort algo ==> O(n.log(n)), so optimal.
+                random_pick_elems_R.append(new_random_pick)
 
-            x = k*self.n**(-1/4)
-            l = max(math.floor(x - math.sqrt(self.n)), 1)
-            h = min(math.ceil(x + math.sqrt(self.n)), n_exp_3_4)
+            random_pick_elems_R.sort()  # sort() use the timsort algo ==> O(n.log(n)), so optimal.
 
-            a = random_pick_elems_R[l]
-            b = random_pick_elems_R[h]
+            x = k * self.n**(-1/4)
+
+            l = max(math.floor(x - self.n**(1/2)), 1)
+            h = min(math.ceil(x + self.n**(1/2)), n_exp_3_4 -1)
+            print(n_exp_3_4, random_pick_elems_R)
+            print(l, h)
+
+            a = random_pick_elems_R[int(l)]
+            b = random_pick_elems_R[int(h)]
+
             rank_a_in_S = self.rank_determination(a)
             rank_b_in_S = self.rank_determination(b)
 
-            if k < self.n ** 1/4:
+            if k < self.n ** (1/4):
                 for y in range(self.n):
                     if self.array[y] <= b:
                         P.append(self.array[y])
 
-            elif k > self.n - self.n**1/4:
+                if k <= rank_b_in_S and len(P) <= (4 * self.n ** (3/4) + 2):
+                    found_flag = True
+                    index = k - rank_a_in_S + 1
+                    self.found_elem = P[index]
+                    self.index_elem = k - rank_a_in_S + 1
+
+            elif k > int(self.n - self.n**(1/4)):
                 for y in range(self.n):
                     if self.array[y] >= a:
                         P.append(self.array[y])
 
-            elif k in range(self.n**1/4, self.n - self.n**1/4):
+                if k >= rank_a_in_S and len(P) <= (4 * self.n ** (3/4) + 2):
+                    found_flag = True
+                    index = k - rank_a_in_S + 1
+                    self.found_elem = P[index]
+                    self.index_elem = k - rank_a_in_S + 1
+
+            elif k in range(int(self.n**(1/4)), int((self.n - self.n**(1/4)) + 1)):  # +1 because of the range function
                 for y in range(self.n):
-                    if a <= y <= b:
-                        P.append(y)
+                    if a <= self.array[y] <= b:
+                        P.append(self.array[y])
+
+                if rank_a_in_S <= k <= rank_b_in_S and len(P) <= (4 * self.n ** (3/4) + 2):
+                    found_flag = True
+                    index = k - rank_a_in_S + 1
+                    self.found_elem = P[index]
+                    self.index_elem = k - rank_a_in_S + 1
+
         P.sort()
-        self.found_elem = P[k - self.array[a]+ 1]
-        return P[k - a + 1]
+        print(P, P[index], index)
+
 
 
 sys.setrecursionlimit(10**8)  # to allow a bigger maximum recursion depth
-test_list = [1,3, 4, 2, 10, 14, 7]
+test_list = [1, 3, 4, 2, 10, 14, 7, 8]
 rando = RandomizedSelectionAlgo(test_list)
-rando.lazy_select(2)
+rando.recursive_quick_select(0, len(test_list) - 1, 3)
 print(rando)

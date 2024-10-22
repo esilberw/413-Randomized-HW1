@@ -15,7 +15,7 @@ class AlgoTest:
             while new_elem in generated_list:
                 new_elem = random.randrange(generated_list_size)
             generated_list.append(new_elem)
-        k = random.choice(generated_list)  # random choice of the element to find, sure is in the list
+        k = random.randint(0, generated_list_size)
         return generated_list, k
 
     def test_quick_select(self):
