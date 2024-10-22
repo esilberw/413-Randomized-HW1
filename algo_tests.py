@@ -27,7 +27,7 @@ class AlgoTest:
     def test_lazy_select(self):
         test_list, k = self.generator_array_k()
         lazy_select = main.RandomizedSelectionAlgo(test_list)
-        lazy_select.lazy_select()
+        print(lazy_select.lazy_select())
         print(lazy_select)
 
 
@@ -35,4 +35,4 @@ if __name__ == '__main__':
     sys.setrecursionlimit(10**8)
     threading.stack_size(200000000)
     algo_test = AlgoTest()
-    algo_test.test_quick_select()
+    algo_test.test_lazy_select()
