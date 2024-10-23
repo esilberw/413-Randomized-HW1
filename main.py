@@ -1,6 +1,7 @@
 import math
 import sys
 import random
+import matplotlib
 
 
 class RandomizedSelectionAlgo:
@@ -11,25 +12,13 @@ class RandomizedSelectionAlgo:
         self.found_elem = -1
         self.index_elem = None
         self.comparison_counter = 0
-        self.quick_select_bound_flag = False
-        self.lazy_select_bound_flag = False
 
     def __repr__(self):
         return self.array
 
     def __str__(self):
         return ("Tested_list: {}\nSize of the list: {}\nElement to find: {}\nIndex of the element: {}\nNumber of "
-                "comparison: {}\nBounded number comparisons: {}").format(self.array, self.n, self.found_elem, self.index_elem, self.comparison_counter, self.quick_select_bound_flag)
-
-    def quick_select_bound_checking(self):
-        quick_select_bound = self.n * 3.386
-        if self.comparison_counter < quick_select_bound:
-            self.quick_select_bound_flag = True
-
-    def lazy_select_bound_checking(self):
-        lazy_select_bound = self.n * 2 + self.n
-        if self.comparison_counter < lazy_select_bound:
-            self.lazy_select_bound_flag = True
+                "comparison: {}").format(self.array, self.n, self.found_elem, self.index_elem, self.comparison_counter)
 
     def partition(self, low, high):
         """
@@ -65,7 +54,6 @@ class RandomizedSelectionAlgo:
         if pivot_index == k - 1:  # if the element is found
             self.found_elem = self.array[pivot_index]
             self.index_elem = pivot_index
-            self.quick_select_bound_checking()
             return self.array[pivot_index]
 
         elif pivot_index > k - 1:  # k is at the left of the pivot
@@ -154,11 +142,11 @@ class RandomizedSelectionAlgo:
         P.sort()
         self.found_elem = P[index]
         self.index_elem = index
-        print(P, P[index], index)
+        return P[index]
 
 
 sys.setrecursionlimit(10**8)  # to allow a bigger maximum recursion depth
-#test_list = [10, 14, 7, 8, 1, 3, 4, 2]
-#rando = RandomizedSelectionAlgo(test_list)
-#print(rando.recursive_quick_select(0,  len(test_list) - 1, 4))
-#print(rando)
+test_list = [10, 14, 7, 8, 1, 3, 4,18, 23, 45, 33, 102, 9,88, 44, 234, 2]
+rando = RandomizedSelectionAlgo(test_list)
+print(rando.lazy_select(2))
+print(rando)
