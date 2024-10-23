@@ -27,7 +27,7 @@ class RandomizedSelectionAlgo:
             self.quick_select_bound_flag = True
 
     def lazy_select_bound_checking(self):
-        lazy_select_bound = self.n * 2
+        lazy_select_bound = self.n * 2 + self.n
         if self.comparison_counter < lazy_select_bound:
             self.lazy_select_bound_flag = True
 
@@ -37,7 +37,7 @@ class RandomizedSelectionAlgo:
         :param high: higher bound of the partition
         :return: the index of the actual random pivot after partitioning
         """""
-        pivot_index = random.randint(low, high)
+        pivot_index = random.randint(low, high)  # pick a random pivot in the remaining considered array
 
         # Move temporally the random pivot
         self.array[pivot_index], self.array[high] = self.array[high], self.array[pivot_index]
@@ -66,7 +66,7 @@ class RandomizedSelectionAlgo:
             self.found_elem = self.array[pivot_index]
             self.index_elem = pivot_index
             self.quick_select_bound_checking()
-            return pivot_index, self.array[pivot_index]
+            return self.array[pivot_index]
 
         elif pivot_index > k - 1:  # k is at the left of the pivot
             return self.recursive_quick_select(low, pivot_index - 1, k)
@@ -75,21 +75,26 @@ class RandomizedSelectionAlgo:
             return self.recursive_quick_select(pivot_index + 1, high, k)
 
     def rank_determination(self, x):
+        """
+        :param x: the item to be ranked
+        :return: the rank of the item x in S (initial array).
+        """
         rank_x = 1
         for elem in self.array:
             if elem < x:
+                self.comparison_counter += 1
                 rank_x += 1
         return rank_x
 
     def lazy_select(self, k):
         """
         :param k: k-th smallest element in the array >< the element k in the array !
-        :param k:
-        :return:
+        :return: the k-th smallest element in the array.
         """
         P = []
         n_exp_3_4 = int(round(self.n ** (3/4)))  # need to convert in int for the forloop
         found_flag = False
+        index = 0
 
         while not found_flag:
             index = 0
@@ -109,8 +114,6 @@ class RandomizedSelectionAlgo:
 
             l = max(math.floor(x - self.n**(1/2)), 0)
             h = min(math.ceil(x + self.n**(1/2)), n_exp_3_4 - 1)
-            print(n_exp_3_4, random_pick_elems_R)
-            print(l, h)
 
             a = random_pick_elems_R[int(l)]
             b = random_pick_elems_R[int(h)]
@@ -121,42 +124,41 @@ class RandomizedSelectionAlgo:
             if k < self.n ** (1/4):
                 for y in range(self.n):
                     if self.array[y] <= b:
+                        self.comparison_counter += 1
                         P.append(self.array[y])
 
                 if k <= rank_b_in_S and len(P) <= (4 * self.n ** (3/4) + 2):
                     found_flag = True
-                    index = k - rank_a_in_S + 1
-                    self.found_elem = P[index]
-                    self.index_elem = k
+                    index = k - rank_a_in_S
 
             elif k > int(self.n - self.n**(1/4)):
                 for y in range(self.n):
                     if self.array[y] >= a:
+                        self.comparison_counter += 1
                         P.append(self.array[y])
 
                 if k >= rank_a_in_S and len(P) <= (4 * self.n ** (3/4) + 2):
                     found_flag = True
-                    index = k - rank_a_in_S + 1
-                    self.found_elem = P[index]
-                    self.index_elem = k - rank_a_in_S + 1
+                    index = k - rank_a_in_S
 
             elif k in range(int(self.n**(1/4)), int((self.n - self.n**(1/4)) + 1)):  # +1 because of the range function
                 for y in range(self.n):
                     if a <= self.array[y] <= b:
+                        self.comparison_counter += 1
                         P.append(self.array[y])
 
                 if rank_a_in_S <= k <= rank_b_in_S and len(P) <= (4 * self.n ** (3/4) + 2):
                     found_flag = True
-                    index = k - rank_a_in_S + 1
-                    self.found_elem = P[index]
-                    self.index_elem = k - rank_a_in_S + 1
+                    index = k - rank_a_in_S
 
         P.sort()
+        self.found_elem = P[index]
+        self.index_elem = index
         print(P, P[index], index)
 
 
 sys.setrecursionlimit(10**8)  # to allow a bigger maximum recursion depth
-test_list = [10, 14, 7, 8, 1, 3, 4, 2]
-rando = RandomizedSelectionAlgo(test_list)
-rando.lazy_select(3)
-print(rando)
+#test_list = [10, 14, 7, 8, 1, 3, 4, 2]
+#rando = RandomizedSelectionAlgo(test_list)
+#print(rando.recursive_quick_select(0,  len(test_list) - 1, 4))
+#print(rando)
