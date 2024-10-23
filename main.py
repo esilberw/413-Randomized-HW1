@@ -1,6 +1,6 @@
 import math
-import random
 import sys
+import random
 
 
 class RandomizedSelectionAlgo:
@@ -31,22 +31,26 @@ class RandomizedSelectionAlgo:
         if self.comparison_counter < lazy_select_bound:
             self.lazy_select_bound_flag = True
 
-    def partition(self, low, high, random_pivot):
+    def partition(self, low, high):
         """
         :param low: lower bound of the partition
         :param high: higher bound of the partition
-        :param random_pivot: random pivot of the partition chosen randomly in the recursive_quick_select() function
         :return: the index of the actual random pivot after partitioning
         """""
-        i = 0
+        pivot_index = random.randint(low, high)
+
+        # Move temporally the random pivot
+        self.array[pivot_index], self.array[high] = self.array[high], self.array[pivot_index]
+        random_pivot = self.array[high]
+
+        i = low
         for j in range(low, high):
             if self.array[j] < random_pivot:    # sort all the element < pivot before the pivot
                 self.comparison_counter += 1
                 self.array[i], self.array[j] = self.array[j], self.array[i]
                 i += 1
 
-        pivot_index = self.array.index(random_pivot)
-        self.array[pivot_index], self.array[i] = self.array[i], self.array[pivot_index]  # move pivot at index i
+        self.array[i], self.array[high] = self.array[high], self.array[i]
         return i
 
     def recursive_quick_select(self, low, high, k):
@@ -56,17 +60,15 @@ class RandomizedSelectionAlgo:
         :param k: the kth largest element of the array
         :return: the kth largest element
         """
+        pivot_index = self.partition(low, high)
 
-        random_pivot = random.choice(self.array)
-        pivot_index = self.partition(low, high, random_pivot)
-
-        if pivot_index - 1 == k - 1:  # if the element is found
+        if pivot_index == k - 1:  # if the element is found
             self.found_elem = self.array[pivot_index]
             self.index_elem = pivot_index
             self.quick_select_bound_checking()
-            return pivot_index - 1, self.array[pivot_index -1]
+            return pivot_index, self.array[pivot_index]
 
-        elif pivot_index - 1> k - 1:  # k is at the left of the pivot
+        elif pivot_index > k - 1:  # k is at the left of the pivot
             return self.recursive_quick_select(low, pivot_index - 1, k)
 
         else:   # k is at the right of the pivot
@@ -105,8 +107,8 @@ class RandomizedSelectionAlgo:
 
             x = k * self.n**(-1/4)
 
-            l = max(math.floor(x - self.n**(1/2)), 1)
-            h = min(math.ceil(x + self.n**(1/2)), n_exp_3_4 -1)
+            l = max(math.floor(x - self.n**(1/2)), 0)
+            h = min(math.ceil(x + self.n**(1/2)), n_exp_3_4 - 1)
             print(n_exp_3_4, random_pick_elems_R)
             print(l, h)
 
@@ -125,7 +127,7 @@ class RandomizedSelectionAlgo:
                     found_flag = True
                     index = k - rank_a_in_S + 1
                     self.found_elem = P[index]
-                    self.index_elem = k - rank_a_in_S + 1
+                    self.index_elem = k
 
             elif k > int(self.n - self.n**(1/4)):
                 for y in range(self.n):
@@ -153,9 +155,8 @@ class RandomizedSelectionAlgo:
         print(P, P[index], index)
 
 
-
 sys.setrecursionlimit(10**8)  # to allow a bigger maximum recursion depth
-test_list = [1, 3, 4, 2, 10, 14, 7, 8]
+test_list = [10, 14, 7, 8, 1, 3, 4, 2]
 rando = RandomizedSelectionAlgo(test_list)
-rando.recursive_quick_select(0, len(test_list) - 1, 3)
+rando.lazy_select(3)
 print(rando)
