@@ -34,8 +34,8 @@ class RandomizedSelectionAlgo:
 
         i = low
         for j in range(low, high):
+            self.comparison_counter += 1
             if self.array[j] < random_pivot:    # sort all the element < pivot before the pivot
-                self.comparison_counter += 1
                 self.array[i], self.array[j] = self.array[j], self.array[i]
                 i += 1
 
@@ -111,33 +111,39 @@ class RandomizedSelectionAlgo:
 
             if k < self.n ** (1/4):
                 for y in range(self.n):
+                    self.comparison_counter += 1
                     if self.array[y] <= b:
-                        self.comparison_counter += 1
                         P.append(self.array[y])
 
                 if k <= rank_b_in_S and len(P) <= (4 * self.n ** (3/4) + 2):
                     found_flag = True
                     index = k - rank_a_in_S
+                    if index < 0:
+                        index = k - 1
 
             elif k > int(self.n - self.n**(1/4)):
                 for y in range(self.n):
+                    self.comparison_counter += 1
                     if self.array[y] >= a:
-                        self.comparison_counter += 1
                         P.append(self.array[y])
 
                 if k >= rank_a_in_S and len(P) <= (4 * self.n ** (3/4) + 2):
                     found_flag = True
                     index = k - rank_a_in_S
+                    if index < 0:
+                        index = k - 1
 
             elif k in range(int(self.n**(1/4)), int((self.n - self.n**(1/4)) + 1)):  # +1 because of the range function
                 for y in range(self.n):
+                    self.comparison_counter += 1
                     if a <= self.array[y] <= b:
-                        self.comparison_counter += 1
                         P.append(self.array[y])
 
                 if rank_a_in_S <= k <= rank_b_in_S and len(P) <= (4 * self.n ** (3/4) + 2):
                     found_flag = True
                     index = k - rank_a_in_S
+                    if index < 0:
+                        index = k - 1
 
         P.sort()
         self.found_elem = P[index]
@@ -146,7 +152,7 @@ class RandomizedSelectionAlgo:
 
 
 sys.setrecursionlimit(10**8)  # to allow a bigger maximum recursion depth
-test_list = [10, 14, 7, 8, 1, 3, 4,18, 23, 45, 33, 102, 9,88, 44, 234, 2]
-rando = RandomizedSelectionAlgo(test_list)
-print(rando.lazy_select(2))
-print(rando)
+#test_list = [10, 14, 7, 8, 1, 3, 4,18, 23, 45, 33, 102, 9,88, 44, 234, 2]
+#rando = RandomizedSelectionAlgo(test_list)
+#print(rando.lazy_select(2))
+#print(rando)
